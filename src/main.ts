@@ -1,6 +1,10 @@
-import "./assets/main.css";
+import "./assets/styles.css";
+import 'highlight.js/styles/github.css'
 
 import { createApp } from "vue";
 import App from "./App.vue";
+import hljsVuePlugin from "@highlightjs/vue-plugin";
 
-createApp(App).mount("#app");
+const app=createApp(App);
+app.use(hljsVuePlugin);
+app.mount("#app");

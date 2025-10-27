@@ -16,8 +16,13 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@highlightjs/vue-plugin": "^2.1.0",
     "@openfeature/go-feature-flag-web-provider": "^0.2.6",
     "@openfeature/web-sdk": "^1.7.0",
+    "@types/uuid": "^10.0.0",
+    "highlightjs": "^9.16.2",
+    "simple-code-editor": "^2.1.0",
+    "uuid": "^13.0.0",
     "vue": "^3.5.22"
   },
   "devDependencies": {
