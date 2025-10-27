@@ -88,7 +88,7 @@ const evaluateFlag = async (flagData: any) => {
     let details: any;
 
     switch (flagData.flagType) {
-      case "boolean":
+      case "bool":
         details = client.getBooleanDetails(
           flagData.flagName,
           flagData.defaultValue,
@@ -112,7 +112,19 @@ const evaluateFlag = async (flagData: any) => {
           flagMetadata: details.flagMetadata,
         };
         break;
-      case "number":
+      case "int":
+        details = client.getNumberDetails(
+          flagData.flagName,
+          flagData.defaultValue,
+        );
+        result = {
+          value: details.value,
+          reason: details.reason,
+          variant: details.variant,
+          flagMetadata: details.flagMetadata,
+        };
+        break;
+      case "float":
         details = client.getNumberDetails(
           flagData.flagName,
           flagData.defaultValue,
@@ -140,13 +152,7 @@ const evaluateFlag = async (flagData: any) => {
         throw new Error(`Unsupported flag type: ${flagData.flagType}`);
     }
 
-    evaluationResult.value = {
-      ...result,
-      flagName: flagData.flagName,
-      flagType: flagData.flagType,
-      targetingKey: flagData.targetingKey,
-      context: flagData.context,
-    };
+    evaluationResult.value = result;
   } catch (err) {
     error.value =
       err instanceof Error ? err.message : "An unknown error occurred";

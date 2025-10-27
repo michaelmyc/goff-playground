@@ -18,7 +18,7 @@ const emit = defineEmits<{
 // Form data
 const formData = ref({
   flagName: "",
-  flagType: "boolean" as "boolean" | "string" | "number" | "object",
+  flagType: "bool" as "bool" | "string" | "int" | "float" | "object",
   defaultValue: "false",
   targetingKey: "",
   context: "{}",
@@ -38,14 +38,17 @@ watch(
   () => formData.value.flagType,
   (newType) => {
     switch (newType) {
-      case "boolean":
+      case "bool":
         formData.value.defaultValue = "false";
         break;
       case "string":
         formData.value.defaultValue = "";
         break;
-      case "number":
+      case "int":
         formData.value.defaultValue = "0";
+        break;
+      case "float":
+        formData.value.defaultValue = "0.0";
         break;
       case "object":
         formData.value.defaultValue = "{}";
@@ -61,7 +64,7 @@ const validateDefaultValue = () => {
   defaultValueError.value = null;
 
   switch (formData.value.flagType) {
-    case "boolean":
+    case "bool":
       if (
         formData.value.defaultValue !== "true" &&
         formData.value.defaultValue !== "false"
@@ -71,9 +74,16 @@ const validateDefaultValue = () => {
         return false;
       }
       break;
-    case "number":
+    case "int":
+      const num = Number(formData.value.defaultValue)
+      if (isNaN(num) || !Number.isInteger(num)) {
+        defaultValueError.value = "Int default value must be a valid int";
+        return false;
+      }
+      break;
+    case "float":
       if (isNaN(Number(formData.value.defaultValue))) {
-        defaultValueError.value = "Number default value must be a valid number";
+        defaultValueError.value = "Float default value must be a valid float";
         return false;
       }
       break;
@@ -118,9 +128,9 @@ const handleSubmit = () => {
 
   // Parse default value based on flag type
   let parsedDefaultValue: any = formData.value.defaultValue;
-  if (formData.value.flagType === "boolean") {
+  if (formData.value.flagType === "bool") {
     parsedDefaultValue = formData.value.defaultValue === "true";
-  } else if (formData.value.flagType === "number") {
+  } else if (formData.value.flagType === "int" || formData.value.flagType === "float") {
     parsedDefaultValue = Number(formData.value.defaultValue);
   } else if (formData.value.flagType === "object") {
     try {
@@ -177,9 +187,10 @@ defineExpose({
     <div class="form-group">
       <label for="flagType">Flag Type:</label>
       <select id="flagType" v-model="formData.flagType">
-        <option value="boolean">Boolean</option>
+        <option value="bool">Boolean</option>
         <option value="string">String</option>
-        <option value="number">Number</option>
+        <option value="int">Integer</option>
+        <option value="float">Float</option>
         <option value="object">Object</option>
       </select>
     </div>
