@@ -46,12 +46,12 @@ const formattedDetails = computed(() => {
     <div v-else-if="result" class="results-content">
       <div class="result-section">
         <h3>Value</h3>
-        <highlightjs :code="formattedValue" language="json"></highlightjs>
+        <highlightjs :code="formattedValue" language="json" :autodetect="false"></highlightjs>
       </div>
       
       <div class="result-section">
         <h3>Details</h3>
-        <highlightjs :code="formattedDetails" language="json"></highlightjs>
+        <highlightjs :code="formattedDetails" language="json" :autodetect="false"></highlightjs>
       </div>
     </div>
     

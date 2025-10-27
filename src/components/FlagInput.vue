@@ -209,8 +209,10 @@ defineExpose({
             :languages="[['json', 'JSON']]"
             :header="false"
             theme="github"
-            padding="15px"
+            padding="10px"
             width="100%"
+            font-size="13px"
+            border-radius="4px"
           />
           <div v-if="contextError" class="error-message">
             {{ contextError }}
