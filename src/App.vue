@@ -6,7 +6,7 @@ import FlagInput from "./components/FlagInput.vue";
 import FlagResults from "./components/FlagResults.vue";
 
 // Global state
-const proxyUrl = ref("http://localhost:1031");
+const proxyUrl = ref("https://flags-test.shukun.net");
 const evaluationResult = ref<any>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
@@ -165,7 +165,7 @@ const evaluateFlag = async (flagData: any) => {
 <template>
   <div class="app-container">
     <header>
-      <h1>Go Feature Flag Playground</h1>
+      <h1>OpenFeature Playground</h1>
     </header>
 
     <div class="main-content">
