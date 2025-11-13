@@ -7,11 +7,13 @@ import CodeEditor from "simple-code-editor";
 // Define props
 const props = defineProps<{
   proxyUrl?: string;
+  apiKey?: string | null;
 }>();
 
 // Define emits
 const emit = defineEmits<{
   (e: "update:proxyUrl", value: string): void;
+  (e: "update:apiKey", value: string | null): void;
   (e: "evaluate", data: any): void;
 }>();
 
@@ -19,7 +21,6 @@ const emit = defineEmits<{
 const formData = ref({
   flagName: "",
   flagType: "bool" as "bool" | "string" | "int" | "float" | "object",
-  defaultValue: "false",
   targetingKey: "",
   context: "{}",
 });
@@ -32,71 +33,6 @@ const defaultValueError = ref<string | null>(null);
 onMounted(() => {
   formData.value.targetingKey = uuidv4();
 });
-
-// Watch for flag type changes to update default value
-watch(
-  () => formData.value.flagType,
-  (newType) => {
-    switch (newType) {
-      case "bool":
-        formData.value.defaultValue = "false";
-        break;
-      case "string":
-        formData.value.defaultValue = "";
-        break;
-      case "int":
-        formData.value.defaultValue = "0";
-        break;
-      case "float":
-        formData.value.defaultValue = "0.0";
-        break;
-      case "object":
-        formData.value.defaultValue = "{}";
-        break;
-    }
-    // Clear any previous default value errors when type changes
-    defaultValueError.value = null;
-  },
-);
-
-// Validate default value based on flag type
-const validateDefaultValue = () => {
-  defaultValueError.value = null;
-
-  switch (formData.value.flagType) {
-    case "bool":
-      if (
-        formData.value.defaultValue !== "true" &&
-        formData.value.defaultValue !== "false"
-      ) {
-        defaultValueError.value =
-          'Boolean default value must be "true" or "false"';
-        return false;
-      }
-      break;
-    case "int":
-      const num = Number(formData.value.defaultValue)
-      if (isNaN(num) || !Number.isInteger(num)) {
-        defaultValueError.value = "Int default value must be a valid int";
-        return false;
-      }
-      break;
-    case "float":
-      if (isNaN(Number(formData.value.defaultValue))) {
-        defaultValueError.value = "Float default value must be a valid float";
-        return false;
-      }
-      break;
-    case "object":
-      try {
-        JSON.parse(formData.value.defaultValue);
-      } catch (e) {
-        defaultValueError.value = "Object default value must be valid JSON";
-        return false;
-      }
-      break;
-  }
-};
 
 const validateAndParseContext = (): any => {
   if (formData.value.context.trim() !== "") {
@@ -116,9 +52,6 @@ const handleSubmit = () => {
   contextError.value = null;
   defaultValueError.value = null;
 
-  // Validate default value
-  validateDefaultValue();
-
   // Validate and parse the context JSON
   const contextObj = validateAndParseContext();
 
@@ -126,25 +59,9 @@ const handleSubmit = () => {
     return;
   }
 
-  // Parse default value based on flag type
-  let parsedDefaultValue: any = formData.value.defaultValue;
-  if (formData.value.flagType === "bool") {
-    parsedDefaultValue = formData.value.defaultValue === "true";
-  } else if (formData.value.flagType === "int" || formData.value.flagType === "float") {
-    parsedDefaultValue = Number(formData.value.defaultValue);
-  } else if (formData.value.flagType === "object") {
-    try {
-      parsedDefaultValue = JSON.parse(formData.value.defaultValue);
-    } catch (e) {
-      // This shouldn't happen since we validated above, but just in case
-      parsedDefaultValue = {};
-    }
-  }
-
   emit("evaluate", {
     flagName: formData.value.flagName,
     flagType: formData.value.flagType,
-    defaultValue: parsedDefaultValue,
     targetingKey: formData.value.targetingKey,
     context: contextObj,
   });
@@ -174,6 +91,19 @@ defineExpose({
     </div>
 
     <div class="form-group">
+      <label for="apiKey">API Key (optional):</label>
+      <input
+        id="apiKey"
+        type="password"
+        :value="props.apiKey || ''"
+        @input="
+          $emit('update:apiKey', ($event.target as HTMLInputElement).value || null)
+        "
+        placeholder="Enter API key (if required)"
+      />
+    </div>
+
+    <div class="form-group">
       <label for="flagName">Flag Name:</label>
       <input
         id="flagName"
@@ -193,19 +123,6 @@ defineExpose({
         <option value="float">Float</option>
         <option value="object">Object</option>
       </select>
-    </div>
-
-    <div class="form-group">
-      <label for="defaultValue">Default Value:</label>
-      <input
-        id="defaultValue"
-        type="text"
-        v-model="formData.defaultValue"
-        placeholder="Enter default value"
-      />
-      <div v-if="defaultValueError" class="error-message">
-        {{ defaultValueError }}
-      </div>
     </div>
 
     <div class="form-group">

@@ -6,7 +6,8 @@ import FlagInput from "./components/FlagInput.vue";
 import FlagResults from "./components/FlagResults.vue";
 
 // Global state
-const proxyUrl = ref("https://flags-test.shukun.net");
+const proxyUrl = ref("");
+const apiKey = ref<string | null>(null);
 const evaluationResult = ref<any>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
@@ -38,8 +39,8 @@ onUnmounted(() => {
 
 // Initialize the GO Feature Flag provider when proxy URL changes
 watch(
-  proxyUrl,
-  async (newUrl) => {
+  [proxyUrl, apiKey],
+  async ([newUrl, newApiKey]) => {
     try {
       isLoading.value = true;
       error.value = null;
@@ -47,9 +48,12 @@ watch(
       // Create the GO Feature Flag provider
       const provider = new GoFeatureFlagWebProvider({
         endpoint: newUrl,
+        apiKey: newApiKey || undefined,
+        maxRetries: 1,
       });
 
       // Set the provider
+      await OpenFeature.clearProviders();
       await OpenFeature.setProviderAndWait(provider);
       providerInitialized.value = true;
     } catch (err) {
@@ -91,7 +95,7 @@ const evaluateFlag = async (flagData: any) => {
       case "bool":
         details = client.getBooleanDetails(
           flagData.flagName,
-          flagData.defaultValue,
+          false,
         );
         result = {
           value: details.value,
@@ -103,7 +107,7 @@ const evaluateFlag = async (flagData: any) => {
       case "string":
         details = client.getStringDetails(
           flagData.flagName,
-          flagData.defaultValue,
+          "",
         );
         result = {
           value: details.value,
@@ -115,7 +119,7 @@ const evaluateFlag = async (flagData: any) => {
       case "int":
         details = client.getNumberDetails(
           flagData.flagName,
-          flagData.defaultValue,
+          0,
         );
         result = {
           value: details.value,
@@ -127,7 +131,7 @@ const evaluateFlag = async (flagData: any) => {
       case "float":
         details = client.getNumberDetails(
           flagData.flagName,
-          flagData.defaultValue,
+          0,
         );
         result = {
           value: details.value,
@@ -139,7 +143,7 @@ const evaluateFlag = async (flagData: any) => {
       case "object":
         details = client.getObjectDetails(
           flagData.flagName,
-          flagData.defaultValue,
+          null,
         );
         result = {
           value: details.value,
@@ -165,7 +169,7 @@ const evaluateFlag = async (flagData: any) => {
 <template>
   <div class="app-container">
     <header>
-      <h1>OpenFeature Playground</h1>
+      <h1>Go Feature Flag Playground</h1>
     </header>
 
     <div class="main-content">
@@ -173,7 +177,9 @@ const evaluateFlag = async (flagData: any) => {
         <FlagInput
           ref="flagInputRef"
           :proxy-url="proxyUrl"
+          :api-key="apiKey"
           @update:proxy-url="proxyUrl = $event"
+          @update:api-key="apiKey = $event"
           @evaluate="evaluateFlag"
         />
       </div>

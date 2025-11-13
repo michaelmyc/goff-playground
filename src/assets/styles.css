@@ -22,9 +22,7 @@ body {
 header {
   text-align: center;
   flex-shrink: 0;
-  margin-bottom: 30px;
   padding: 20px 0;
-  border-bottom: 1px solid #e0e0e0;
 }
 
 header h1 {
@@ -50,6 +48,10 @@ header h1 {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid #e0e0e0;
   overflow-y: auto;
+}
+
+.section h2 {
+  margin: 0.7em 0;
 }
 
 .form-group {

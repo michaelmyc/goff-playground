@@ -11,10 +11,10 @@ docker run --rm \
   sh -c "npm install && npm run build"
 
 # Build the Nginx Docker image
-docker build -t openfeature-playground .
+docker build -t goff-playground .
 
 # Clean up
 rm -rf dist
 
 echo "Build completed successfully!"
-echo "Docker image 'openfeature-playground' is ready to use."
+echo "Docker image 'goff-playground' is ready to use."
