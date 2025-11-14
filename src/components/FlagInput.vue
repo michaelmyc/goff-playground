@@ -86,7 +86,7 @@ defineExpose({
         @input="
           $emit('update:proxyUrl', ($event.target as HTMLInputElement).value)
         "
-        placeholder="http://localhost:1031"
+        placeholder="URL to Go Feature Flag Proxy"
       />
     </div>
 
